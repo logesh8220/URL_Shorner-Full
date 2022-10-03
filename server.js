@@ -193,4 +193,4 @@ app.get("/urlshortner/users", authenticate, async function (req, res) {
   }
 });
 
-app.listen(process.env.PORT || 3005);
+app.listen(process.env.PORT || 3000);
