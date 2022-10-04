@@ -19,7 +19,7 @@ mongoose.connect(process.env.DB_URI, {
 });
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URI,
   })
 );
 
