@@ -138,7 +138,7 @@ app.post("/forgot", async function (req, res) {
         let resettoken = jwt.sign({ _id: user._id }, process.env.SECRET, {
           expiresIn: "5m",
         });
-        let link = `http://localhost:3000/${user._id}/${resettoken}`;
+        let link = `${process.env.CLIENT_URI}/${user._id}/${resettoken}`;
         let mailOptons = {
           from: "logeshthirumurugan@gmail.com",
           to: user.Email,
