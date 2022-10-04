@@ -19,7 +19,7 @@ mongoose.connect(process.env.DB_URI, {
 });
 app.use(
   cors({
-    origin: process.env.CLIENT_URI,
+    origin:process.env.CLIENT_URI
   })
 );
 
@@ -41,15 +41,27 @@ let authenticate = (req, res, next) => {
 };
 
 app.get("/urlshortner", authenticate, async function (req, res) {
-  const data = await ShortUrl.find();
-  res.json(data);
+  try {
+    const data = await ShortUrl.find();
+    res.json(data);
+  } catch (error) {
+    res.status(404).json({ message: "somthing went wrong" });
+  }
 });
 app.post("/urlshortner", async function (req, res) {
-  let data = await ShortUrl.create(req.body);
-  if (!validUrl.isUri(req.body)) {
-    return res.status(401), json("Invalid Url");
+  try {
+    let data = await ShortUrl.create(req.body);
+    if (!validUrl.isUri(req.body.full)) {
+      return res.status(401), json("Invalid Url");
+    }
+    else {
+
+      res.send(data)
+    }
+
+  } catch (error) {
+    res.status(404).json({ message: "somthing went wrong" });
   }
-  res.send(data);
 });
 app.get("/:short", async function (req, res) {
   const shortid = req.params.short;
@@ -73,8 +85,8 @@ app.post("/signup", async function (req, res) {
     let salt = await bcrypt.genSalt(10);
     let hash = await bcrypt.hash(req.body.Password, salt);
     req.body.Password = hash;
-   let data = await Users.create(req.body);
-   res.status(200).json({message:"Sighin Successfully"})
+    let data = await Users.create(req.body);
+    res.status(200).json({ message: "Sighin Successfully" })
     res.json(data)
   } catch (error) {
     console.log(error);
@@ -88,17 +100,17 @@ app.post("/login", async function (req, res) {
       let compare = await bcrypt.compare(req.body.Password, user.Password);
       if (compare) {
         let token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-          expiresIn: "20m",
+          expiresIn: "60m",
         });
-      user.updateOne({token:token},function (err,sucsses){
-        if(err){
-          console.log(err)
-        }else{
+        user.updateOne({ token: token }, function (err, sucsses) {
+          if (err) {
+            console.log(err)
+          } else {
 
-          res.json(user);
-        }
-      })
-        
+            res.json(user);
+          }
+        })
+
       } else {
         res.status(401).json({ message: "Username / Password is Wrong" });
       }
@@ -203,7 +215,7 @@ app.get("/urlshortner/users", authenticate, async function (req, res) {
 });
 app.delete("/urlshortner/:urlid", async function (req, res) {
   try {
-    let data = await ShortUrl.findOneAndDelete({_id:req.params.urlid});
+    let data = await ShortUrl.findOneAndDelete({ _id: req.params.urlid });
     res.json(data);
   } catch (error) {
     res.status(404).json({ message: "somthing went wrong" });
