@@ -36,7 +36,7 @@ let authenticate = (req, res, next) => {
   }
 };
 
-app.get("/urlshortner", authenticate, async function (req, res) {
+app.get("/urlshortner", async function (req, res) {
   try {
     const data = await ShortUrl.find();
     res.json(data);
@@ -201,7 +201,7 @@ app.put("/:userid/:token", async function (req, res) {
   }
 });
 
-app.get("/urlshortner/users", authenticate, async function (req, res) {
+app.get("/urlshortner/users", async function (req, res) {
   try {
     let data = await Users.find();
     res.json(data);
